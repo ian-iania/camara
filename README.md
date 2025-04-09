@@ -99,7 +99,19 @@ Uma versão que usa um servidor HTTP simples para servir uma página estática c
 - `serve.py`: Inicia um servidor HTTP simples e um servidor Streamlit para o chatbot
 - `serve_fixed.py` e `serve_new.py`: Variações do servidor com diferentes configurações de porta
 - `serve_direct.py`: Servidor para a versão direta do chatbot
-- `serve_complete.py`: Servidor para a versão completa integrada em HTML
+- `serve_complete.py`: Versão que usa um servidor HTTP simples para servir uma página estática com o chatbot integrado
+
+### Arquivos para deploy
+
+- `static/`: Diretório com arquivos estáticos para deploy no Netlify
+  - `index.html`: Página principal do site
+  - `css/styles.css`: Estilos CSS para o site e chatbot
+  - `js/chatbot.js`: JavaScript para a funcionalidade do chatbot
+- `backend_api/`: Diretório com o backend para deploy no Render
+  - `api_server.py`: Servidor Flask para a API do chatbot
+  - `requirements.txt`: Dependências do backend
+  - `Procfile`: Configuração para deploy no Render
+- `netlify.toml`: Configuração para deploy no Netlify
 
 ### Arquivos estáticos e templates
 
@@ -135,9 +147,95 @@ Uma versão que usa um servidor HTTP simples para servir uma página estática c
 
 ## Solução de problemas
 
-- Se o chatbot não aparecer, verifique se os servidores estão rodando nas portas corretas
-- Se as respostas não forem relevantes, verifique se os documentos foram indexados corretamente
-- Se o chatbot travar, tente usar a versão `original_chatbot_server.py` que é mais estável
+Se você encontrar algum problema ao executar o chatbot, verifique:
+
+1. Se as chaves de API do Pinecone e OpenAI estão configuradas corretamente no arquivo `.env`
+2. Se o índice do Pinecone existe e está configurado corretamente
+3. Se todas as dependências estão instaladas
+4. Se o servidor está rodando na porta correta (8080 por padrão)
+5. Se o chatbot não aparecer, verifique se os servidores estão rodando nas portas corretas
+6. Se as respostas não forem relevantes, verifique se os documentos foram indexados corretamente
+7. Se o chatbot travar, tente usar a versão `original_chatbot_server.py` que é mais estável
+
+## Deploy
+
+### Deploy no Netlify (Frontend)
+
+Para fazer o deploy do frontend no Netlify:
+
+1. Crie uma conta no [Netlify](https://www.netlify.com/)
+2. Instale a CLI do Netlify:
+   ```
+   npm install -g netlify-cli
+   ```
+3. Faça login na sua conta:
+   ```
+   netlify login
+   ```
+4. Inicie o deploy:
+   ```
+   netlify deploy --prod
+   ```
+5. Quando solicitado, especifique o diretório `static` como o diretório de publicação
+
+Alternativamente, você pode fazer o deploy diretamente pelo site do Netlify, arrastando e soltando a pasta `static` na interface de upload.
+
+### Deploy no Render (Backend)
+
+Para fazer o deploy do backend no Render:
+
+1. Crie uma conta no [Render](https://render.com/)
+2. Crie um novo Web Service
+3. Conecte seu repositório GitHub ou faça upload do código
+4. Configure as seguintes opções:
+   - **Nome**: camara-chatbot-api
+   - **Ambiente**: Python
+   - **Diretório de Construção**: backend_api
+   - **Comando de Inicialização**: gunicorn api_server:app
+5. Adicione as variáveis de ambiente:
+   - `PINECONE_API_KEY`: Sua chave de API do Pinecone
+   - `OPENAI_API_KEY`: Sua chave de API do OpenAI
+   - `ENVIRONMENT`: Seu ambiente do Pinecone (geralmente "gcp-starter")
+6. Clique em "Create Web Service"
+
+Após o deploy, atualize o arquivo `netlify.toml` com o URL do seu serviço no Render.
+
+### Deploy no PythonAnywhere (Solução Alternativa)
+
+Se você estiver enfrentando problemas com o Netlify e o Render, o PythonAnywhere é uma excelente alternativa para deploy, especialmente para testes:
+
+1. **Preparação**:
+   - Use os arquivos na pasta `pythonanywhere_deploy/`
+   - Esta versão combina frontend e backend em uma única aplicação Flask
+
+2. **Passos para Deploy**:
+   - Crie uma conta gratuita no [PythonAnywhere](https://www.pythonanywhere.com/)
+   - No Dashboard, clique em "Web" e depois "Add a new web app"
+   - Escolha "Manual configuration" e selecione Python 3.9+
+   - Faça upload dos arquivos da pasta `pythonanywhere_deploy/` para sua conta
+   - Crie um ambiente virtual e instale as dependências:
+     ```
+     cd ~/mysite
+     python -m venv venv
+     source venv/bin/activate
+     pip install -r requirements.txt
+     ```
+   - Configure o arquivo WSGI para apontar para sua aplicação
+   - Adicione suas variáveis de ambiente (PINECONE_API_KEY, OPENAI_API_KEY, ENVIRONMENT)
+   - Reinicie o web app
+
+3. **Vantagens**:
+   - Plano gratuito adequado para testes
+   - Solução tudo-em-um (frontend + backend)
+   - Especializado em hospedagem Python
+   - Interface simples de usar
+
+Para instruções detalhadas, consulte o README na pasta `pythonanywhere_deploy/`.
+
+Depois de fazer o deploy do frontend e do backend, você precisa:
+
+1. Atualizar o redirecionamento no arquivo `netlify.toml` para apontar para o URL do seu backend
+2. Fazer o redeploy do frontend para aplicar as alterações
 
 ## Licença
 
