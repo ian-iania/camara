@@ -68,10 +68,11 @@ def generate_response(query, documents, chat_history=None):
 Use apenas as informações dos documentos para responder. Se a informação não estiver nos documentos, diga que não tem essa informação.
 
 Formatação das respostas:
-1. Quando listar itens numerados, coloque cada item em uma linha separada.
-2. Use markdown para destacar informações importantes: **negrito**, *itálico*, etc.
-3. Separe parágrafos com linhas em branco.
-4. Mantenha a formatação limpa e organizada.
+1. Quando listar itens numerados, coloque cada item em uma linha separada, SEM linhas em branco entre os itens.
+2. Se um item numerado tiver subitens com bullets, coloque-os logo abaixo do item principal.
+3. Use markdown para destacar informações importantes: **negrito**, *itálico*, etc.
+4. Separe parágrafos principais com linhas em branco, mas NÃO coloque linhas em branco entre itens numerados.
+5. Coloque uma linha em branco apenas antes do último parágrafo conclusivo.
 
 Contexto dos documentos:
 
@@ -99,31 +100,46 @@ def format_response_html(text):
     # Escape HTML to prevent XSS
     text = html.escape(text)
     
-    # Process numbered lists (e.g., "1. Item")
-    text = re.sub(r'(\d+\.\s)([^\n]+)', r'<li><strong>\1</strong>\2</li>', text)
+    # First, identify paragraphs (text blocks separated by double newlines)
+    paragraphs = re.split(r'\n\s*\n', text)
+    formatted_paragraphs = []
     
-    # Convert markdown bold to HTML
-    text = re.sub(r'\*\*([^*]+)\*\*', r'<strong>\1</strong>', text)
+    for paragraph in paragraphs:
+        # Check if this paragraph contains a numbered list
+        if re.search(r'^\d+\.', paragraph, re.MULTILINE):
+            # This is a paragraph with a numbered list
+            # Process each line
+            lines = paragraph.split('\n')
+            formatted_lines = []
+            
+            for line in lines:
+                # Check if this is a numbered item
+                if re.match(r'^\d+\.', line):
+                    # Format numbered item
+                    formatted_lines.append(f'<li><strong>{line.split(".", 1)[0]}.</strong>{line.split(".", 1)[1]}</li>')
+                elif re.match(r'^\s*[\-\*]', line):
+                    # This is a bullet point (sub-item)
+                    formatted_lines.append(f'<li class="sub-item">{line.strip()}</li>')
+                else:
+                    # Regular line within a list
+                    formatted_lines.append(line)
+            
+            # Join the lines and wrap in a list
+            formatted_paragraph = '<ul class="numbered-list">' + ''.join(formatted_lines) + '</ul>'
+            formatted_paragraphs.append(formatted_paragraph)
+        else:
+            # Regular paragraph - just wrap in <p> tags
+            # Convert markdown bold to HTML
+            paragraph = re.sub(r'\*\*([^*]+)\*\*', r'<strong>\1</strong>', paragraph)
+            # Convert markdown italic to HTML
+            paragraph = re.sub(r'\*([^*]+)\*', r'<em>\1</em>', paragraph)
+            # Convert single newlines to <br>
+            paragraph = paragraph.replace('\n', '<br>')
+            
+            formatted_paragraphs.append(f'<p>{paragraph}</p>')
     
-    # Convert markdown italic to HTML
-    text = re.sub(r'\*([^*]+)\*', r'<em>\1</em>', text)
-    
-    # Convert double newlines to paragraph breaks
-    text = re.sub(r'\n\s*\n', '</p><p>', text)
-    
-    # Convert single newlines to line breaks
-    text = re.sub(r'\n', '<br>', text)
-    
-    # Wrap in paragraph tags if not already
-    if not text.startswith('<p>'):
-        text = '<p>' + text
-    if not text.endswith('</p>'):
-        text = text + '</p>'
-    
-    # Wrap lists in <ul> tags
-    text = re.sub(r'(<li>.*?</li>)', r'<ul>\1</ul>', text, flags=re.DOTALL)
-    
-    return text
+    # Join all formatted paragraphs
+    return ''.join(formatted_paragraphs)
 
 # HTML template for the main page with embedded chatbot
 MAIN_PAGE_HTML = '''
@@ -276,6 +292,19 @@ MAIN_PAGE_HTML = '''
             margin-bottom: 8px;
             text-indent: -20px;
             padding-left: 20px;
+        }
+        
+        .assistant-message li.sub-item {
+            margin-left: 20px;
+            margin-bottom: 4px;
+            text-indent: -15px;
+            padding-left: 15px;
+        }
+        
+        .assistant-message .numbered-list {
+            padding-left: 0;
+            margin-top: 5px;
+            margin-bottom: 5px;
         }
         
         .assistant-message p {
