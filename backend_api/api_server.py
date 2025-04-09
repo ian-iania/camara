@@ -14,10 +14,11 @@ load_dotenv()
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 INDEX_NAME = "pdf"
+ENVIRONMENT = os.getenv("ENVIRONMENT")
 
 # Initialize the Pinecone client
-pc = pinecone.Pinecone(api_key=PINECONE_API_KEY)
-index = pc.Index(INDEX_NAME)
+pinecone.init(api_key=PINECONE_API_KEY, environment=ENVIRONMENT)
+index = pinecone.Index(INDEX_NAME)
 
 # Initialize OpenAI client
 client = OpenAI(api_key=OPENAI_API_KEY)
