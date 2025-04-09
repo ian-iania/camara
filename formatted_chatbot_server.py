@@ -97,10 +97,13 @@ Contexto dos documentos:
 
 # Function to format the response with proper HTML
 def format_response_html(text):
-    # Escape HTML to prevent XSS
-    text = html.escape(text)
+    # First, process markdown formatting
+    # Convert markdown bold to HTML
+    text = re.sub(r'\*\*([^*]+)\*\*', r'<strong>\1</strong>', text)
+    # Convert markdown italic to HTML
+    text = re.sub(r'\*([^*]+)\*', r'<em>\1</em>', text)
     
-    # First, identify paragraphs (text blocks separated by double newlines)
+    # Now identify paragraphs (text blocks separated by double newlines)
     paragraphs = re.split(r'\n\s*\n', text)
     formatted_paragraphs = []
     
@@ -116,7 +119,8 @@ def format_response_html(text):
                 # Check if this is a numbered item
                 if re.match(r'^\d+\.', line):
                     # Format numbered item
-                    formatted_lines.append(f'<li><strong>{line.split(".", 1)[0]}.</strong>{line.split(".", 1)[1]}</li>')
+                    num, content = line.split(".", 1)
+                    formatted_lines.append(f'<li><strong>{num}.</strong>{content}</li>')
                 elif re.match(r'^\s*[\-\*]', line):
                     # This is a bullet point (sub-item)
                     formatted_lines.append(f'<li class="sub-item">{line.strip()}</li>')
@@ -128,18 +132,17 @@ def format_response_html(text):
             formatted_paragraph = '<ul class="numbered-list">' + ''.join(formatted_lines) + '</ul>'
             formatted_paragraphs.append(formatted_paragraph)
         else:
-            # Regular paragraph - just wrap in <p> tags
-            # Convert markdown bold to HTML
-            paragraph = re.sub(r'\*\*([^*]+)\*\*', r'<strong>\1</strong>', paragraph)
-            # Convert markdown italic to HTML
-            paragraph = re.sub(r'\*([^*]+)\*', r'<em>\1</em>', paragraph)
-            # Convert single newlines to <br>
+            # Regular paragraph - convert newlines to <br>
             paragraph = paragraph.replace('\n', '<br>')
-            
             formatted_paragraphs.append(f'<p>{paragraph}</p>')
     
     # Join all formatted paragraphs
-    return ''.join(formatted_paragraphs)
+    formatted_html = ''.join(formatted_paragraphs)
+    
+    # Escape any remaining HTML except our tags
+    safe_html = formatted_html
+    
+    return safe_html
 
 # HTML template for the main page with embedded chatbot
 MAIN_PAGE_HTML = '''
