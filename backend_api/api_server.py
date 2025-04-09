@@ -21,7 +21,16 @@ pinecone.init(api_key=PINECONE_API_KEY, environment=ENVIRONMENT, default_index=I
 index = pinecone.Index(INDEX_NAME)
 
 # Initialize OpenAI client
-client = OpenAI(api_key=OPENAI_API_KEY)
+try:
+    # Tenta inicializar sem proxies (para ambientes locais)
+    client = OpenAI(api_key=OPENAI_API_KEY)
+except TypeError:
+    # Se falhar, tenta com httpx client explícito (para PythonAnywhere)
+    import httpx
+    client = OpenAI(
+        api_key=OPENAI_API_KEY,
+        http_client=httpx.Client(proxies=None)
+    )
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
