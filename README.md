@@ -51,20 +51,92 @@ Os PDFs devem estar na pasta `PDFs/`.
 
 ### Executando o chatbot
 
-Para iniciar o servidor com o chatbot:
+Existem várias maneiras de executar o chatbot, dependendo das suas necessidades:
+
+#### Versão recomendada (testada e funcional)
+
+Esta é a versão mais estável e testada:
 
 ```
 python original_chatbot_server.py
 ```
 
-O servidor estará disponível em `http://localhost:8080`.
+O servidor estará disponível em `http://localhost:8080`. Esta versão integra o site da Câmara Espanhola com o chatbot em uma única página, utilizando Pinecone para busca de documentos e OpenAI para geração de respostas.
+
+#### Outras versões disponíveis
+
+1. **Versão com Streamlit:**
+```
+python serve.py
+```
+Esta versão usa o Streamlit para criar a interface do chatbot, mas pode ter problemas de carregamento em alguns casos.
+
+2. **Versão direta com Flask:**
+```
+python direct_chatbot.py
+```
+Uma versão simplificada que usa Flask diretamente para servir o chatbot.
+
+3. **Versão com servidor HTTP simples:**
+```
+python serve_complete.py
+```
+Uma versão que usa um servidor HTTP simples para servir uma página estática com o chatbot integrado.
 
 ## Estrutura do Projeto
 
+### Arquivos principais
+
 - `index_pdfs.py`: Script para extrair texto de PDFs e indexá-los no Pinecone
-- `original_chatbot_server.py`: Servidor Flask que integra o site e o chatbot
+- `original_chatbot_server.py`: **[RECOMENDADO]** Servidor Flask que integra o site e o chatbot com Pinecone
+- `smart_chatbot_server.py`: Versão com formatação aprimorada (pode ser instável)
+- `direct_chatbot.py`: Implementação direta do chatbot usando Flask
+- `chatbot_embed.py` e `chatbot_embed_fixed.py`: Versões do chatbot para uso com Streamlit
+
+### Servidores e integrações
+
+- `serve.py`: Inicia um servidor HTTP simples e um servidor Streamlit para o chatbot
+- `serve_fixed.py` e `serve_new.py`: Variações do servidor com diferentes configurações de porta
+- `serve_direct.py`: Servidor para a versão direta do chatbot
+- `serve_complete.py`: Servidor para a versão completa integrada em HTML
+
+### Arquivos estáticos e templates
+
 - `static/`: Pasta contendo arquivos estáticos para o site
-- `PDFs/`: Pasta para armazenar os documentos PDF a serem indexados
+  - `index.html`: Página principal do site com o chatbot integrado
+  - `index_direct.html`: Versão alternativa da página principal
+  - `index_new.html`: Outra variação da página principal
+  - `complete_solution.html`: Solução completa em um único arquivo HTML
+  - `chatbot.html`: Interface isolada do chatbot
+- `templates/`: Pasta para templates do Flask
+  - `index.html`: Template básico para o site
+
+### Outras implementações
+
+- `app.py`: Implementação original do chatbot usando Streamlit
+- `app_direct.py`: Versão direta do app Streamlit
+- `popup_chatbot.py` e `popup_chatbot_simple.py`: Versões iniciais do chatbot pop-up
+
+## Como funciona
+
+1. **Indexação de documentos:**
+   - O script `index_pdfs.py` extrai texto de documentos PDF
+   - Divide o texto em chunks menores
+   - Gera embeddings usando a API da OpenAI
+   - Armazena os embeddings no Pinecone para busca rápida
+
+2. **Fluxo do chatbot:**
+   - O usuário faz uma pergunta
+   - O sistema gera um embedding para a pergunta
+   - Busca no Pinecone os documentos mais relevantes
+   - Envia os documentos relevantes e a pergunta para a API da OpenAI
+   - Recebe e exibe a resposta gerada
+
+## Solução de problemas
+
+- Se o chatbot não aparecer, verifique se os servidores estão rodando nas portas corretas
+- Se as respostas não forem relevantes, verifique se os documentos foram indexados corretamente
+- Se o chatbot travar, tente usar a versão `original_chatbot_server.py` que é mais estável
 
 ## Licença
 
