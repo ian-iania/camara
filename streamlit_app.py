@@ -155,16 +155,19 @@ st.markdown("""
         border-radius: 10px;
         padding: 10px;
         margin-bottom: 10px;
+        border: 1px solid #e0e0e0;
     }
     
     /* Mensagem do usuário */
     .stChatMessage[data-testid="stChatMessageUser"] {
         background-color: #e1f5fe;
+        color: #0c344b;
     }
     
     /* Mensagem do assistente */
     .stChatMessage[data-testid="stChatMessageAssistant"] {
         background-color: #f5f5f5;
+        color: #333333;
     }
     
     /* Cabeçalho */
@@ -183,6 +186,52 @@ st.markdown("""
         margin-top: 20px;
         font-size: 0.8em;
         color: #666;
+    }
+    
+    /* Ajustes globais para garantir contraste */
+    body {
+        color: #333333;
+        background-color: #ffffff;
+    }
+    
+    /* Forçar cor do texto em elementos específicos */
+    .stMarkdown p, .stMarkdown li, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
+        color: #333333 !important;
+    }
+    
+    /* Ajuste para o input do chat */
+    .stChatInputContainer textarea {
+        color: #333333;
+        background-color: #ffffff;
+    }
+    
+    /* Ajuste para o fundo da página */
+    .stApp {
+        background-color: #ffffff;
+    }
+    
+    /* Ajuste para links */
+    a {
+        color: #0066cc !important;
+    }
+    
+    /* Ajuste para texto dentro de mensagens do chat */
+    .stChatMessage[data-testid="stChatMessageAssistant"] p,
+    .stChatMessage[data-testid="stChatMessageAssistant"] li,
+    .stChatMessage[data-testid="stChatMessageAssistant"] a,
+    .stChatMessage[data-testid="stChatMessageAssistant"] h1,
+    .stChatMessage[data-testid="stChatMessageAssistant"] h2,
+    .stChatMessage[data-testid="stChatMessageAssistant"] h3 {
+        color: #333333 !important;
+    }
+    
+    .stChatMessage[data-testid="stChatMessageUser"] p,
+    .stChatMessage[data-testid="stChatMessageUser"] li,
+    .stChatMessage[data-testid="stChatMessageUser"] a,
+    .stChatMessage[data-testid="stChatMessageUser"] h1,
+    .stChatMessage[data-testid="stChatMessageUser"] h2,
+    .stChatMessage[data-testid="stChatMessageUser"] h3 {
+        color: #0c344b !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -230,4 +279,4 @@ if prompt := st.chat_input("Digite sua mensagem..."):
     st.session_state.messages.append({"role": "assistant", "content": response})
 
 # Rodapé
-st.markdown('<div class="footer">© 2025 Câmara Oficial Espanhola de Comércio no Brasil</div>', unsafe_allow_html=True)
+st.markdown('<div class="footer"> 2025 Câmara Oficial Espanhola de Comércio no Brasil</div>', unsafe_allow_html=True)
