@@ -1,0 +1,16 @@
+[build]
+  publish = "static"
+  command = "echo 'No build command needed'"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://camara-chatbot-api.onrender.com/api/:splat"
+  status = 200
+  force = true
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+    Access-Control-Allow-Headers = "Origin, X-Requested-With, Content-Type, Accept"
