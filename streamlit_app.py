@@ -116,14 +116,26 @@ def generate_response(query, documents, chat_history=None):
         chat_history = []
     
     if not documents:
-        return "Desculpe, não consegui encontrar informações relevantes para responder à sua pergunta. Poderia reformular ou fazer outra pergunta?"
+        return "Não tenho informações suficientes para responder a essa pergunta. Posso ajudar com informações sobre a Câmara Espanhola, seus serviços, eventos e atividades. Poderia reformular sua pergunta?"
     
     # Preparar contexto a partir dos documentos recuperados
     context = "\n\n".join([f"Documento de {doc['source']} (relevância: {doc['score']:.2f}):\n{doc['text']}" for doc in documents])
     
-    # Preparar mensagens para o chat
+    # Preparar mensagens para o chat com instruções específicas para evitar frases como "A documentação não menciona..."
     messages = [
-        {"role": "system", "content": f"Você é um assistente útil da Câmara Oficial Espanhola de Comércio no Brasil. Responda perguntas com base nos documentos fornecidos. Use apenas as informações dos documentos para responder. Se a informação não estiver nos documentos, diga que não tem essa informação. Contexto dos documentos:\n\n{context}"},
+        {"role": "system", "content": f"""Você é um assistente útil da Câmara Oficial Espanhola de Comércio no Brasil. 
+Responda perguntas com base nos documentos fornecidos. Use apenas as informações dos documentos para responder.
+
+IMPORTANTE:
+1. Se a informação estiver nos documentos, forneça-a diretamente sem mencionar a fonte.
+2. Se a informação NÃO estiver nos documentos, NÃO use frases como "A documentação não menciona" ou "Não há informações sobre".
+3. Em vez disso, responda diretamente o que você sabe sobre o assunto, sem referir-se à falta de informação nos documentos.
+4. Se não souber a resposta, sugira alternativas ou indique onde a pessoa pode buscar essa informação.
+5. Mantenha suas respostas concisas e diretas.
+
+Contexto dos documentos:
+
+{context}"""},
     ]
     
     # Adicionar histórico do chat
