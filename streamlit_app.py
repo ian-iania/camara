@@ -149,89 +149,187 @@ def generate_response(query, documents, chat_history=None):
 # CSS personalizado para melhorar a aparência
 st.markdown("""
 <style>
-    /* Estilo para mensagens do chat */
-    .stChatMessage {
-        background-color: white;
-        border-radius: 10px;
-        padding: 10px;
-        margin-bottom: 10px;
-        border: 1px solid #e0e0e0;
+    /* Respeitar preferência de tema do sistema */
+    @media (prefers-color-scheme: dark) {
+        .stApp {
+            background-color: #1e1e1e;
+            color: #f0f0f0;
+        }
+        
+        /* Estilo para mensagens do chat no modo escuro */
+        .stChatMessage {
+            background-color: #2d2d2d;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #444;
+        }
+        
+        /* Mensagem do usuário no modo escuro */
+        .stChatMessage[data-testid="stChatMessageUser"] {
+            background-color: #0e4a6b;
+            color: #e1f5fe;
+        }
+        
+        /* Mensagem do assistente no modo escuro */
+        .stChatMessage[data-testid="stChatMessageAssistant"] {
+            background-color: #2d2d2d;
+            color: #e0e0e0;
+        }
+        
+        /* Cabeçalho no modo escuro */
+        .main-header {
+            background-color: #c60b1e;
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        /* Rodapé no modo escuro */
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.8em;
+            color: #aaa;
+        }
+        
+        /* Ajuste para o input do chat no modo escuro */
+        .stChatInputContainer textarea {
+            color: #f0f0f0;
+            background-color: #333;
+            border: 1px solid #555;
+        }
+        
+        /* Ajuste para links no modo escuro */
+        a {
+            color: #4da6ff !important;
+        }
+        
+        /* Ajuste para texto dentro de mensagens do chat no modo escuro */
+        .stChatMessage[data-testid="stChatMessageAssistant"] p,
+        .stChatMessage[data-testid="stChatMessageAssistant"] li,
+        .stChatMessage[data-testid="stChatMessageAssistant"] h1,
+        .stChatMessage[data-testid="stChatMessageAssistant"] h2,
+        .stChatMessage[data-testid="stChatMessageAssistant"] h3 {
+            color: #e0e0e0 !important;
+        }
+        
+        .stChatMessage[data-testid="stChatMessageUser"] p,
+        .stChatMessage[data-testid="stChatMessageUser"] li,
+        .stChatMessage[data-testid="stChatMessageUser"] h1,
+        .stChatMessage[data-testid="stChatMessageUser"] h2,
+        .stChatMessage[data-testid="stChatMessageUser"] h3 {
+            color: #e1f5fe !important;
+        }
+        
+        /* Ajuste para links dentro de mensagens no modo escuro */
+        .stChatMessage[data-testid="stChatMessageAssistant"] a {
+            color: #4da6ff !important;
+        }
+        
+        .stChatMessage[data-testid="stChatMessageUser"] a {
+            color: #8ecdf9 !important;
+        }
     }
     
-    /* Mensagem do usuário */
-    .stChatMessage[data-testid="stChatMessageUser"] {
-        background-color: #e1f5fe;
-        color: #0c344b;
+    @media (prefers-color-scheme: light) {
+        /* Estilo para mensagens do chat no modo claro */
+        .stChatMessage {
+            background-color: white;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        /* Mensagem do usuário no modo claro */
+        .stChatMessage[data-testid="stChatMessageUser"] {
+            background-color: #e1f5fe;
+            color: #0c344b;
+        }
+        
+        /* Mensagem do assistente no modo claro */
+        .stChatMessage[data-testid="stChatMessageAssistant"] {
+            background-color: #f5f5f5;
+            color: #333333;
+        }
+        
+        /* Cabeçalho no modo claro */
+        .main-header {
+            background-color: #c60b1e;
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        /* Rodapé no modo claro */
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.8em;
+            color: #666;
+        }
+        
+        /* Ajuste para o input do chat no modo claro */
+        .stChatInputContainer textarea {
+            color: #333333;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+        }
+        
+        /* Ajuste para links no modo claro */
+        a {
+            color: #0066cc !important;
+        }
+        
+        /* Ajuste para texto dentro de mensagens do chat no modo claro */
+        .stChatMessage[data-testid="stChatMessageAssistant"] p,
+        .stChatMessage[data-testid="stChatMessageAssistant"] li,
+        .stChatMessage[data-testid="stChatMessageAssistant"] h1,
+        .stChatMessage[data-testid="stChatMessageAssistant"] h2,
+        .stChatMessage[data-testid="stChatMessageAssistant"] h3 {
+            color: #333333 !important;
+        }
+        
+        .stChatMessage[data-testid="stChatMessageUser"] p,
+        .stChatMessage[data-testid="stChatMessageUser"] li,
+        .stChatMessage[data-testid="stChatMessageUser"] h1,
+        .stChatMessage[data-testid="stChatMessageUser"] h2,
+        .stChatMessage[data-testid="stChatMessageUser"] h3 {
+            color: #0c344b !important;
+        }
+        
+        /* Ajuste para links dentro de mensagens no modo claro */
+        .stChatMessage[data-testid="stChatMessageAssistant"] a {
+            color: #0066cc !important;
+        }
+        
+        .stChatMessage[data-testid="stChatMessageUser"] a {
+            color: #0277bd !important;
+        }
     }
     
-    /* Mensagem do assistente */
-    .stChatMessage[data-testid="stChatMessageAssistant"] {
-        background-color: #f5f5f5;
-        color: #333333;
+    /* Botão de envio personalizado */
+    .stChatInputContainer button {
+        border-radius: 20px;
     }
     
-    /* Cabeçalho */
-    .main-header {
-        background-color: #c60b1e;
-        padding: 20px;
-        border-radius: 10px;
-        color: white;
-        margin-bottom: 20px;
-        text-align: center;
+    /* Remover bordas e sombras indesejadas */
+    .stApp > header {
+        display: none;
     }
     
-    /* Rodapé */
-    .footer {
-        text-align: center;
-        margin-top: 20px;
-        font-size: 0.8em;
-        color: #666;
+    .stApp > footer {
+        display: none;
     }
     
-    /* Ajustes globais para garantir contraste */
-    body {
-        color: #333333;
-        background-color: #ffffff;
-    }
-    
-    /* Forçar cor do texto em elementos específicos */
-    .stMarkdown p, .stMarkdown li, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
-        color: #333333 !important;
-    }
-    
-    /* Ajuste para o input do chat */
-    .stChatInputContainer textarea {
-        color: #333333;
-        background-color: #ffffff;
-    }
-    
-    /* Ajuste para o fundo da página */
-    .stApp {
-        background-color: #ffffff;
-    }
-    
-    /* Ajuste para links */
-    a {
-        color: #0066cc !important;
-    }
-    
-    /* Ajuste para texto dentro de mensagens do chat */
-    .stChatMessage[data-testid="stChatMessageAssistant"] p,
-    .stChatMessage[data-testid="stChatMessageAssistant"] li,
-    .stChatMessage[data-testid="stChatMessageAssistant"] a,
-    .stChatMessage[data-testid="stChatMessageAssistant"] h1,
-    .stChatMessage[data-testid="stChatMessageAssistant"] h2,
-    .stChatMessage[data-testid="stChatMessageAssistant"] h3 {
-        color: #333333 !important;
-    }
-    
-    .stChatMessage[data-testid="stChatMessageUser"] p,
-    .stChatMessage[data-testid="stChatMessageUser"] li,
-    .stChatMessage[data-testid="stChatMessageUser"] a,
-    .stChatMessage[data-testid="stChatMessageUser"] h1,
-    .stChatMessage[data-testid="stChatMessageUser"] h2,
-    .stChatMessage[data-testid="stChatMessageUser"] h3 {
-        color: #0c344b !important;
+    /* Ajuste para o modo de tema do Streamlit */
+    [data-testid="stAppViewBlockContainer"] {
+        background: inherit;
     }
 </style>
 """, unsafe_allow_html=True)
