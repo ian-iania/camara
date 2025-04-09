@@ -89,7 +89,8 @@ Uma versão que usa um servidor HTTP simples para servir uma página estática c
 
 - `index_pdfs.py`: Script para extrair texto de PDFs e indexá-los no Pinecone
 - `original_chatbot_server.py`: **[RECOMENDADO]** Servidor Flask que integra o site e o chatbot com Pinecone
-- `smart_chatbot_server.py`: Versão com formatação aprimorada (pode ser instável)
+- `formatted_chatbot_server.py`: **[NOVA VERSÃO]** Versão com formatação aprimorada para listas numeradas e markdown
+- `smart_chatbot_server.py`: Versão alternativa com formatação (pode ser instável)
 - `direct_chatbot.py`: Implementação direta do chatbot usando Flask
 - `chatbot_embed.py` e `chatbot_embed_fixed.py`: Versões do chatbot para uso com Streamlit
 
